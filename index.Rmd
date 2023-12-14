@@ -61,10 +61,11 @@ The first two accompanying visualizations are the cross tables below. This is in
 
 For my main visualization, I created a bar chart pertaining to the hypothesis for both whether or not the district flipped (main question), but also I created an additional visualization that accounted for the direction in which the district flipped (Democrat to Republican or Republican to Democrat) as per the first cross table. 
 
-The main visualization allows the viewer to see with color and the height of the bars the extent to which the level of gerrymandering affected whether or not the district flipped. From this bar graph (and the exact numbers provided on the crosstable), we can observe that, from 2016 to 2018, comparing low gerry mandered districts and high gerry mandered districts, more low gerry mandered districts flipped than high gerry mandered districts. However, mid gerry mandered districts presents an outlier here, as has a higher number of districts flipped than low gerry mandered districts. Perhaps we could conclude here that, though not a gradient, 
+The main visualization allows the viewer to see with color and the height of the bars the extent to which the level of gerrymandering affected whether or not the district flipped. From this bar graph (and the exact numbers provided on the crosstable), we can observe that, from 2016 to 2018, comparing low gerry mandered districts and high gerry mandered districts, more low gerry mandered districts flipped than high gerry mandered districts. However, mid gerry mandered districts presents an outlier here, as has a higher number of districts flipped than low gerry mandered districts. 
+
+However, when we look at the percentage of low gerry mandered districts that flipped out of total low gerry mandered districts, the value is 16.13% compared to 10.37% for medium and 4.85% for high. This shows that, within their respective groups, the percentage of districts flipped of total districts in that level decereases the higher the gerry mandering level. These percentages are arguably more accurate than the simple numerical numbers because there are a vastly greater amount of medium and high gerrymandered districts, which skew the results. In this case, the hypothesis would be proven correct.
 
 As for the regression, I chose a logistic regression because I was using categorical variables and wanted to make the process similar. This also changed my hypothesis to flipping districts in general (and not accounting for the direction) so that the logistic regression could be binary. To complete the logistic regression, we hold clinton16 and trump16 as our controls and place the dependent variable (whether or not the district flips) in relation to the independent variable (the level of gerrymandering). If we observe the coefficients, we can see that for low gerrymandered districts (the intercept), the likelihood of the district flipping decreased by 0.006, mid gerrymandered districts decreased by 0.515 units and high gerrymandered districts decreased by 1.328 units. This means that high gerrymandered districts decrease the likelihood of the district flipping by the most units. The high gerrymandered district variable was also the one that presented statistical significance, as p < 0.05 (p = 0.021) and therefore this specific observation can be interpreted as causal. However, for low gerrymandered districts and medium gerrymandered districts, p > 0.05 and thus the null hypothesis was accepted and there was not statistical significance. 
-
 
 
 
@@ -88,6 +89,8 @@ CrossTable(x = gerrymandering$gerry_new, y = gerrymandering$flipped_district,
 
 
 ```
+
+
 
 ```{r}
 ggplot(data = gerrymandering,
@@ -123,7 +126,7 @@ gof_map = c("nobs", "r.squared", "adj.r.squared")
 ```
 
 ## 4. Conclusion
-In general, the extremes of the results (low gerrymandered districts and high gerrymandered districts) prove the hypothesis correct based on the numerical data of the number of districts flipped being higher for low gerrymandered districts and lower for high gerrymandered districts. However, when determining statistical significance through using the logistical regression, the hypothesis is only proven correct (and the null hypothesis rejected) for high gerrymandered districts since p = 0.021 and is therefore less than 0.05. This therefore means that, although the hypthesis holds true in terms of some of our data points, there are exceptions within our data that either disprove the hypothesis or do not show statistical significance in our data. 
+In general, the results prove the hypothesis correct when taking the percentages of the districts in a level of gerrymandering that flipped over the total number of districts in that level -- we see that the higher the level of gerrymandering, the less likely the district is to flip. However, when determining statistical significance through using the logistical regression, the hypothesis is only proven correct (and the null hypothesis rejected) for high gerrymandered districts since p = 0.021 and is therefore less than 0.05. This therefore means that, although the hypthesis holds true in terms of some of our data points, there are exceptions within our data that either disprove the hypothesis or do not show statistical significance in our data. 
 
 The limitations to our analysis and the threats to inference are that:
 1. From looking at online data of the 2018 House elections, the popular vote flip and number of seats flip are generally proportional: the seats won by each party are generally also won by popular vote, which seems contrary to an effect of gerrymandering. This is true, however, the U.S. uses a first-past-the-post voting system, and in such a system, the seats won by each party and popular vote won by each party should NOT be proportional. 
