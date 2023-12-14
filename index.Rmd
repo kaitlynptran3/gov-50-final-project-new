@@ -53,6 +53,7 @@ ggplot(data = gerrymandering,
   labs(x = "Presidential Candidate", y = "Number of Districts", title = "Congressional Districts in 2018 and their Presidential Vote", fill = "Presidential Candidate") 
 
 ##Additional graph showing total number of districts flipped and not flipped.
+
 class(gerrymandering$flipped_district)
 names(gerrymandering$flipped_district) <- c("Not Flipped", "Flipped")
 
