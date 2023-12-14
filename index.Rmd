@@ -1,14 +1,158 @@
 ---
 title: "Gov 50 Final Project"
-author: "Your Name Here"
-description: "My final project"
+author: "Kaitlyn Tran"
+description: "Gerrymandering in the 2018 House Elections"
 output:
   distill::distill_article:
     self_contained: false
 ---
 
+## 1 - Introduction
+In this project, my primary research question was: Did partisan gerrymandering prevent districts from being flipped (from Republican to Democrat or vice versa) in the 2018 House elections? My hypothesis is that, yes, gerrymandering will prevent districts from being flipped in the 2018 House elections (a relatively small number of House seats will be flipped). This is because gerrymandering allows the party that manages the redistricting to pack opposing party voters into a small number of districts and crack opposing party voters into being small minorities in remaining districts. This process would therefore mean that, because the districts have been manipulated, they would be more difficult to flip as there would be fewer marginal districts.
+
+This topic is important because gerrymandering is a key component of how U.S. elections can be flawed and therefore not represent the people's will. Furthermore, as my primary question evaluates if there was a concrete impact of the gerrymandering on the actual elections (and therefore who is chosen to represent the American people), the subject has critical importance on our present day political system. 
+
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(infer)
+library(descr)
+library(broom)
+
+gerrymandering <- read.csv("gerrymander.csv")
+gerrymandering
+
+```
+
+## 2 - Data Section
+The data source was pulled from the website OpenIntro (an educational website) at this link: https://www.openintro.org/data/index.php?data=gerrymander. 
+
+The key dependent and independent variables we are examining are flip18 (whether or not the district flipped) and gerry (the level (low, mid, or high) that the district was gerrymandered. The dependent variable, the flip18 data, could have been collected through public election information from the 2016 and 2018 House Elections to determine whether or not the district had flipped parties. 
+
+As for the independent variable, the Washington Post article that is listed as the source for the dataset explains that the compactness of the district was used to determine how gerrymandered the district was. The compactness of the district was measured by how irregular the shape was: measuring the ratio of the area of the district to the area of a circle with the same perimeter. District boundary files from the Census were used to calculate these compactness scores for the 114th Congress. 
+
+Below, the plot is a box plot that illustrates the number of districts that voted Democrat and the number of districts that voted Republican in the House elections in 2018. This offers insight into our dependent variable, whether or not the district flipped, as we can see quantify and visualize the number of districts that each party voted for taking into account our dependent variable of which districts had flipped; these are the effects after the gerrymandering that (potentially) affected the dependent variable. 
+
+I also quickly sketched an additional plot that isolates the dependent variable and shows how many districts were flipped or not flipped in the 2018 House Elections, though this is not the main first visualization. 
+
+
+
+```{r}
+library(ggplot2)
+gerrymandering$dem18 <- as.factor(gerrymandering$dem18)
+class(gerrymandering$dem18)
+names(gerrymandering$dem18) <- c("Republican", "Democrat")
+
+ggplot(data = gerrymandering,
+       mapping = aes(x = dem18, fill = dem18)) +
+  geom_bar() +
+  scale_x_discrete(labels = c("Republican", "Democrat")) +
+  scale_fill_manual(values = c("red", "blue")) +
+  labs(x = "Presidential Candidate", y = "Number of Districts", title = "Congressional Districts in 2018 and their Presidential Vote", fill = "Presidential Candidate") 
+
+##Additional graph showing total number of districts flipped and not flipped.
+class(gerrymandering$flipped_district)
+names(gerrymandering$flipped_district) <- c("Not Flipped", "Flipped")
+
+ggplot(data = gerrymandering,
+       mapping = aes(x = flipped_district)) +
+  geom_bar() +
+  scale_x_discrete(labels = c("Not Flipped", "Flipped")) +
+  labs(x = "Flip of District", y = "Number of Districts", title = "Congressional Districts that Flipped in the 2018 House Elections", fill = "District")
+
+```
+
+## 3. Results Section
+For my results, I developed one main visualization and a few accompanying visualizations. 
+
+The first two accompanying visualizations are the cross tables below. This is intended to be an easy way to look at the simple number of districts that were flipped or not flipped depending on whether the level of gerrymandering was low, mid, or high. The first cross table is just for additional information to show if the district had flipped from Democrat to Republican (-1), did not flip (0), or flipped from Republican to Democrat (1). The second cross table pertains to the hypothesis (and groups "flipped" as one category) and shows if the district flipped or did not flip according to low, mid, or high levels of gerrymandering. 
+
+For my main visualization, I created a bar chart pertaining to the hypothesis for both whether or not the district flipped (main question), but also I created an additional visualization that accounted for the direction in which the district flipped (Democrat to Republican or Republican to Democrat) as per the first cross table. 
+
+The main visualization allows the viewer to see with color and the height of the bars the extent to which the level of gerrymandering affected whether or not the district flipped. From this bar graph (and the exact numbers provided on the crosstable), we can observe that, from 2016 to 2018, comparing low gerry mandered districts and high gerry mandered districts, more low gerry mandered districts flipped than high gerry mandered districts. However, mid gerry mandered districts presents an outlier here, as has a higher number of districts flipped than low gerry mandered districts. Perhaps we could conclude here that, though not a gradient, 
+
+As for the regression, I chose a logistic regression because I was using categorical variables and wanted to make the process similar. This also changed my hypothesis to flipping districts in general (and not accounting for the direction) so that the logistic regression could be binary. To complete the logistic regression, we hold clinton16 and trump16 as our controls and place the dependent variable (whether or not the district flips) in relation to the independent variable (the level of gerrymandering). If we observe the coefficients, we can see that for low gerrymandered districts (the intercept), the likelihood of the district flipping decreased by 0.006, mid gerrymandered districts decreased by 0.515 units and high gerrymandered districts decreased by 1.328 units. This means that high gerrymandered districts decrease the likelihood of the district flipping by the most units. The high gerrymandered district variable was also the one that presented statistical significance, as p < 0.05 (p = 0.021) and therefore this specific observation can be interpreted as causal. However, for low gerrymandered districts and medium gerrymandered districts, p > 0.05 and thus the null hypothesis was accepted and there was not statistical significance. 
+
+
+```{r}
+gerrymandering$flip18 <- as.factor(gerrymandering$flip18)
+class(gerrymandering$flip18)
+levels(gerrymandering$flip18)
+
+library(descr) 
+CrossTable(x = gerrymandering$gerry_new, y = gerrymandering$flip18,
+           prop.r = FALSE, prop.c = TRUE, prop.t = FALSE,
+           prop.chisq = FALSE)
+
+```
+
+```{r}
+
+##The below crosstable shows the results if we combine flip18 = -1 (Democrat to Republican) and 1 (Republican to Democrat) represent if a district flipped at all (in either direction). We will use this variable for the second visualization so that we can work with a binary in order to develop a logistic regression that is more suitable for our categorical variables. 
+gerrymandering <- gerrymandering |>
+  mutate(
+  flipped_district = ifelse((flip18) == 0, "0", "1"))
+
+levels(gerrymandering$flipped_districts)
+
+gerrymandering$gerry_new <-
+  factor(gerrymandering$gerry, levels = c("low", "mid", "high"))
+
+
+library(descr) 
+CrossTable(x = gerrymandering$gerry_new, y = gerrymandering$flipped_district,
+           prop.r = FALSE, prop.c = TRUE, prop.t = FALSE,
+           prop.chisq = FALSE)
+
+
+```
+
+```{r}
+ggplot(data = gerrymandering,
+       mapping = aes(x = factor(flip18), fill = factor(gerry_new))) +
+         geom_bar(position = "dodge") +
+      labs(x = "Flip Direction", y = "Number of Districts", fill = "Level of Gerrymandering") +
+    scale_x_discrete(labels = c("Democrat to Republican", "No Change", "Republican to Democrat"))
+
+
+```
+
+
+```{r}
+
+ggplot(data = gerrymandering,
+       mapping = aes(x = factor(flipped_district), fill = factor(gerry_new))) +
+         geom_bar(position = "dodge") +
+      labs(x = "District Flip", y = "Number of Districts", fill = "Level of Gerrymandering") +
+    scale_x_discrete(labels = c("No Change", "Flipped District"))
+
+gerrymandering$flipped_district <- as.numeric(gerrymandering$flipped_district)
+
+logistic_regression <- glm(flipped_district ~ gerry_new + clinton16 + trump16, family = "binomial", data = gerrymandering)
+summary(logistic_regression)
+
+modelsummary::modelsummary(
+logistic_regression,
+statistic = c("s.e. = {std.error}",
+"p = {p.value}"),
+gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+
+```
+
+## 4. Conclusion
+In general, the extremes of the results (low gerrymandered districts and high gerrymandered districts) prove the hypothesis correct based on the numerical data of the number of districts flipped being higher for low gerrymandered districts and lower for high gerrymandered districts. However, when determining statistical significance through using the logistical regression, the hypothesis is only proven correct (and the null hypothesis rejected) for high gerrymandered districts since p = 0.021 and is therefore less than 0.05. This therefore means that, although the hypthesis holds true in terms of some of our data points, there are exceptions within our data that either disprove the hypothesis or do not show statistical significance in our data. 
+
+The limitations to our analysis and the threats to inference are that:
+1. From looking at online data of the 2018 House elections, the popular vote flip and number of seats flip are generally proportional: the seats won by each party are generally also won by popular vote, which seems contrary to an effect of gerrymandering. This is true, however, the U.S. uses a first-past-the-post voting system, and in such a system, the seats won by each party and popular vote won by each party should NOT be proportional. 
+2. Redistricting happens every 10 years, so the last time redistricting occurred before the 2018 data was in 2010. Would there still be an impact in 2018 - why wouldn't the impact occur before 2018 and remain that way? In response, I would argue that the districts that flip are the most competitive districts that could go either way, and therefore the impact of gerrymandering may not flip the margin the first election but that doesn't nullify its impact to affect future elections. Also, 2016 to 2018 matters in particular because that election showed a large popular vote flip. 
+3. There could be confounding factors to account for, such as lower voter turnout due to this being a midterm election and voters being less willing to change who they vote for (which would affect the number of districts not flipping). Regardless, these are factors that exist in every election that can not be changed, but they also do not necessarily disprove the existence and impact of gerrymandering as a practice.
+
+If I had more time or data/resources, I would look more in-depth into specifically certain districts where gerrymandering is particularly common, for example North Carolina, and determine when . I would also look into if districts seem to be more gerrymandered to favor Democrats or Republicans, as most media coverage on gerrymandering notes that Republicans are the main perpetrators, so I'd like to investigate the data on this. In the future, I would also take a look at the data for the 2020, 2022, and upcoming 2024 elections, as in 2019, the Supreme Court ruled that federal courts do not have the authority to determine if election maps are drawn in a disproportionately partisan manner. I would see if this would create more gerrymandering that affected flipped seats than in the 2014, 2016, and 2018 elections. 
 
 
 ## Project thoughts
 
-I am interested in exploring data related to...
+I changed the dataset for the final project so past milestones have been updated (but the old coding has still been included). Please see those parts for what originally would have been my progress over the semester at the bottom of this page.
