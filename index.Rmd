@@ -52,17 +52,6 @@ ggplot(data = gerrymandering,
   scale_fill_manual(values = c("red", "blue")) +
   labs(x = "Presidential Candidate", y = "Number of Districts", title = "Congressional Districts in 2018 and their Presidential Vote", fill = "Presidential Candidate") 
 
-##Additional graph showing total number of districts flipped and not flipped.
-
-class(gerrymandering$flipped_district)
-names(gerrymandering$flipped_district) <- c("Not Flipped", "Flipped")
-
-ggplot(data = gerrymandering,
-       mapping = aes(x = flipped_district)) +
-  geom_bar() +
-  scale_x_discrete(labels = c("Not Flipped", "Flipped")) +
-  labs(x = "Flip of District", y = "Number of Districts", title = "Congressional Districts that Flipped in the 2018 House Elections", fill = "District")
-
 ```
 
 ## 3. Results Section
@@ -77,17 +66,7 @@ The main visualization allows the viewer to see with color and the height of the
 As for the regression, I chose a logistic regression because I was using categorical variables and wanted to make the process similar. This also changed my hypothesis to flipping districts in general (and not accounting for the direction) so that the logistic regression could be binary. To complete the logistic regression, we hold clinton16 and trump16 as our controls and place the dependent variable (whether or not the district flips) in relation to the independent variable (the level of gerrymandering). If we observe the coefficients, we can see that for low gerrymandered districts (the intercept), the likelihood of the district flipping decreased by 0.006, mid gerrymandered districts decreased by 0.515 units and high gerrymandered districts decreased by 1.328 units. This means that high gerrymandered districts decrease the likelihood of the district flipping by the most units. The high gerrymandered district variable was also the one that presented statistical significance, as p < 0.05 (p = 0.021) and therefore this specific observation can be interpreted as causal. However, for low gerrymandered districts and medium gerrymandered districts, p > 0.05 and thus the null hypothesis was accepted and there was not statistical significance. 
 
 
-```{r}
-gerrymandering$flip18 <- as.factor(gerrymandering$flip18)
-class(gerrymandering$flip18)
-levels(gerrymandering$flip18)
 
-library(descr) 
-CrossTable(x = gerrymandering$gerry_new, y = gerrymandering$flip18,
-           prop.r = FALSE, prop.c = TRUE, prop.t = FALSE,
-           prop.chisq = FALSE)
-
-```
 
 ```{r}
 
